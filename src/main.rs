@@ -1,4 +1,5 @@
 use std::any::type_name;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 struct V2 {
@@ -23,7 +24,26 @@ fn main() {
     test_vec();
     test_lambda_invoke();
     test_borrow();
-    Some(1);
+    test_hashmap();
+
+    test_unwrap();
+}
+
+fn test_unwrap() {
+    use std::fs::File;
+    let mut f = File::open("test")?;
+}
+
+fn test_hashmap() {
+    let mut hm = HashMap::new();
+    hm.insert(String::from("k1"), 1);
+    hm.insert(String::from("k2"), 2);
+    assert_eq!(hm.get(&String::from("k1")), Some(&1));
+    assert_eq!(hm.get(&String::from("k2")), Some(&2));
+    hm.insert(String::from("k2"), 2);
+    assert_eq!("{\"k1\": 1, \"k2\": 2}", format!("{:?}", hm));
+
+    // TODO https://doc.rust-lang.org/book/ch08-03-hash-maps.html#only-inserting-a-value-if-the-key-has-no-value
 }
 
 fn test_borrow() {
