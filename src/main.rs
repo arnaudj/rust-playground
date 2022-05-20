@@ -1,3 +1,5 @@
+# https://gist.github.com/arnaudj/32e373f374f17a4d68447d8c779c30ae
+
 use std::any::type_name;
 use std::collections::HashMap;
 
@@ -15,23 +17,32 @@ impl V2 {
 
 fn main() {
     test_format();
-    test_scope();
+    test_struct();
     test_if_let();
     test_match();
     test_trait();
     test_clone();
     test_call_parameterized_func();
     test_vec();
-    test_lambda_invoke();
+    test_closure_invoke();
     test_borrow();
     test_hashmap();
-
-    test_unwrap();
+    match test_unwrap_result() {
+        Err(e) => println!("{:?}", e),
+        _ => (),
+    }
+    test_unwrap_option();
 }
 
-fn test_unwrap() {
-    use std::fs::File;
-    let mut f = File::open("test")?;
+use std::num::ParseIntError;
+fn test_unwrap_result() -> Result<i32, ParseIntError> {
+    let v1 = "123".parse::<i32>()?;
+    return Ok(v1);
+}
+
+fn test_unwrap_option() -> Option<i32> {
+    let o1 = Some(1)?;
+    return Some(o1);
 }
 
 fn test_hashmap() {
@@ -86,23 +97,24 @@ where
     return if sort_asc(a, b) { (a, b) } else { (b, a) };
 }
 
-fn test_lambda_invoke() {
+fn test_closure_invoke() {
     assert_eq!((|x| x)(5), 5);
     assert_eq!((|| 1)(), 1);
 
     fn gt1(a: u16, b: u16) -> bool {
         return if a <= b { true } else { false };
     }
-    let gt_lambda = |a, b| a <= b;
-    let gt_lambda_typed = |a: u16, b: u16| -> bool { a <= b };
+    let gt_closure = |a, b| a <= b;
+    let gt_closure_typed = |a: u16, b: u16| -> bool { a <= b };
     assert_eq!(sort(1, 2, gt1), (1, 2));
-    assert_eq!(sort(1, 2, gt_lambda), (1, 2));
-    assert_eq!(sort(1, 2, gt_lambda_typed), (1, 2));
+    assert_eq!(sort(1, 2, gt_closure), (1, 2));
+    assert_eq!(sort(1, 2, gt_closure_typed), (1, 2));
     //
     assert_eq!(sort(3, 1, gt1), (1, 3));
-    assert_eq!(sort(3, 1, gt_lambda), (1, 3));
-    assert_eq!(sort(3, 1, gt_lambda_typed), (1, 3));
+    assert_eq!(sort(3, 1, gt_closure), (1, 3));
+    assert_eq!(sort(3, 1, gt_closure_typed), (1, 3));
 }
+
 
 fn test_call_parameterized_func() {
     let name_1 = type_name::<u8>();
@@ -160,7 +172,7 @@ fn test_if_let() {
 }
 
 #[allow(unreachable_code)]
-fn test_scope() {
+fn test_struct() {
     let x = {
         let a = 1;
         let b = 2;
