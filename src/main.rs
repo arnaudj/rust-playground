@@ -1,5 +1,3 @@
-# https://gist.github.com/arnaudj/32e373f374f17a4d68447d8c779c30ae
-
 use std::any::type_name;
 use std::collections::HashMap;
 
@@ -10,7 +8,7 @@ struct V2 {
 }
 
 impl V2 {
-    fn is_odd(self) -> bool {
+    fn is_odd(&self) -> bool {
         self.odd
     }
 }
@@ -27,9 +25,8 @@ fn main() {
     test_closure_invoke();
     test_borrow();
     test_hashmap();
-    match test_unwrap_result() {
-        Err(e) => println!("{:?}", e),
-        _ => (),
+    if let Err(e) = test_unwrap_result() {
+        panic!("Unexpected error {:?}", e)
     }
     test_unwrap_option();
 }
@@ -37,12 +34,12 @@ fn main() {
 use std::num::ParseIntError;
 fn test_unwrap_result() -> Result<i32, ParseIntError> {
     let v1 = "123".parse::<i32>()?;
-    return Ok(v1);
+    Ok(v1)
 }
 
 fn test_unwrap_option() -> Option<i32> {
     let o1 = Some(1)?;
-    return Some(o1);
+    Some(o1)
 }
 
 fn test_hashmap() {
@@ -51,9 +48,6 @@ fn test_hashmap() {
     hm.insert(String::from("k2"), 2);
     assert_eq!(hm.get(&String::from("k1")), Some(&1));
     assert_eq!(hm.get(&String::from("k2")), Some(&2));
-    hm.insert(String::from("k2"), 2);
-    assert_eq!("{\"k1\": 1, \"k2\": 2}", format!("{:?}", hm));
-
     // TODO https://doc.rust-lang.org/book/ch08-03-hash-maps.html#only-inserting-a-value-if-the-key-has-no-value
 }
 
@@ -94,15 +88,21 @@ fn sort<F>(a: u16, b: u16, sort_asc: F) -> (u16, u16)
 where
     F: Fn(u16, u16) -> bool,
 {
-    return if sort_asc(a, b) { (a, b) } else { (b, a) };
+    if sort_asc(a, b) {
+        (a, b)
+    } else {
+        (b, a)
+    }
 }
 
 fn test_closure_invoke() {
-    assert_eq!((|x| x)(5), 5);
-    assert_eq!((|| 1)(), 1);
+    let identity = |x| x;
+    let one = || 1;
+    assert_eq!(identity(5), 5);
+    assert_eq!(one(), 1);
 
     fn gt1(a: u16, b: u16) -> bool {
-        return if a <= b { true } else { false };
+        a <= b
     }
     let gt_closure = |a, b| a <= b;
     let gt_closure_typed = |a: u16, b: u16| -> bool { a <= b };
@@ -114,7 +114,6 @@ fn test_closure_invoke() {
     assert_eq!(sort(3, 1, gt_closure), (1, 3));
     assert_eq!(sort(3, 1, gt_closure_typed), (1, 3));
 }
-
 
 fn test_call_parameterized_func() {
     let name_1 = type_name::<u8>();
@@ -135,16 +134,16 @@ fn test_clone() {
 
 fn test_trait() {
     trait Signed {
-        fn is_positive(self) -> bool;
+        fn is_positive(&self) -> bool;
     }
     impl Signed for V2 {
-        fn is_positive(self) -> bool {
-            return self.nb > 0;
+        fn is_positive(&self) -> bool {
+            self.nb > 0
         }
     }
 
     let s = V2 { odd: false, nb: 2 };
-    assert_eq!(true, s.is_positive());
+    assert!(s.is_positive());
 }
 
 fn test_match() {
@@ -168,7 +167,7 @@ fn test_if_let() {
     } else {
         panic!("");
     }
-    assert_eq!(true, s.is_odd());
+    assert!(s.is_odd());
 }
 
 #[allow(unreachable_code)]
