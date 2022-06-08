@@ -1,0 +1,26 @@
+name: Rust - playground
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - 'playground/**'
+  pull_request:
+    branches: [ "master" ]
+    paths:
+      - 'playground/**'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      working-directory: ./playground
+      run: cargo build --verbose
+    - name: Run tests
+      working-directory: ./playground
+      run: cargo test --verbose
