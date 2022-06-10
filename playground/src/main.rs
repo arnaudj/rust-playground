@@ -1,9 +1,42 @@
 use log::info;
+use std::env;
 
 fn main() {
-    println!("Hello, world!");
     logtools::setup_logging().expect("Unable to init logger");
     info!("Hello, world!");
+
+    let args: Vec<String> = env::args().collect();
+    if let Ok(config) = config::Config::new(&args) {
+        info!("Got config: {config:?}");
+    } else {
+        panic!("Unable to get config");
+    }
+}
+
+mod config {
+
+    #[derive(Debug)]
+    #[allow(dead_code)]
+    pub struct Config {
+        arg0: String,
+        arg1: String,
+    }
+
+    impl Config {
+        pub fn new(args: &[String]) -> Result<Config, &'static str> {
+            match args.len() {
+                1 => Ok(Config {
+                    arg0: args[0].clone(),
+                    arg1: String::from(""),
+                }),
+                2 => Ok(Config {
+                    arg0: args[0].clone(),
+                    arg1: args[1].clone(),
+                }),
+                _ => Err("Invalid number of arguments"),
+            }
+        }
+    }
 }
 
 mod logtools {
