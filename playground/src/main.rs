@@ -1,5 +1,6 @@
 use log::info;
 use std::env;
+use tcpserver::run as run_tcp_server;
 
 fn main() {
     logtools::setup_logging().expect("Unable to init logger");
@@ -11,6 +12,8 @@ fn main() {
     } else {
         panic!("Unable to get config");
     }
+
+    run_tcp_server();
 }
 
 mod config {

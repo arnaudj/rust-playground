@@ -77,6 +77,14 @@ dependencies = [
  "chrono",
  "fern",
  "log",
+ "tcpserver",
+]
+
+[[package]]
+name = "tcpserver"
+version = "0.1.0"
+dependencies = [
+ "log",
 ]
 
 [[package]]
